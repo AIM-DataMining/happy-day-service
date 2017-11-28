@@ -15,3 +15,20 @@ Bei einer falschen Klassifizierung wird das Bild zum Training des CNN verwendet 
 # HappyDay Service
 
 In diesem Repository befindet sich das Backend zu HappyDay. 
+
+## Start
+
+Zum besseren Testen und Deployen habe ich mich für Docker entschieden. 
+
+```
+docker build -t happyday-image .
+
+docker run -it -p 5000:5000 --name happyday happyday-image 
+```
+
+Anschließend ist der Service unter `http://0.0.0.0:5000` erreichbar. 
+
+## Endpoints
+
+### GET / 
+Gibt den String `Hello World!\n` zurück.
