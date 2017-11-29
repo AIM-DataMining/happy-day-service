@@ -37,11 +37,26 @@ def images(sentiment=None):
     return json.dumps({"ok": True, "files": dir_list})
 
 
-@app.route('/upload', methods=['POST'])
-def upload_file():
+@app.route('/prediction', methods=['POST'])
+def prediction():
     local_path, filename = save_to_disk(request.data)
     client.upload_sync(remote_path=BASE_PATH + filename, local_path=local_path + filename)
     return json.dumps({"ok": True})
+
+
+@app.route('/upload/<sentiment>', methods=['POST'])
+def upload_file(sentiment=None):
+    remote_path = None
+    local_path, filename = save_to_disk(request.data)
+    if sentiment == "sad":
+        remote_path = BASE_PATH + "sad/" + filename
+    elif sentiment == "smile":
+        remote_path = BASE_PATH + "smile/" + filename
+    if remote_path is not None:
+        client.upload_sync(remote_path=remote_path, local_path=local_path + filename)
+        return json.dumps({"ok": True})
+    else:
+        return json.dumps({"ok": False})
 
 
 @app.route('/retrain/<sentiment>', methods=["POST"])
