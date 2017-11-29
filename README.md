@@ -32,3 +32,17 @@ Anschließend ist der Service unter `http://0.0.0.0:5000` erreichbar.
 
 ### GET / 
 Gibt den String `Hello World!\n` zurück.
+
+### GET /images
+lists all images in dir.
+
+### GET /images/<sentiment>
+lists all images in dir <sentiment> only "sad" and "smile" are available
+
+### POST /upload
+receives a file and moves it to webdav destination, and later for training
+
+
+### POST /retrain/<sentiment>
+NOT YET IMPLEMENTED, empty endpoint. Returns always `{"ok": true}`
+retrains a file for given sentiment (sad or smile) 
