@@ -37,14 +37,14 @@ def images(sentiment=None):
     return json.dumps({"ok": True, "files": dir_list})
 
 
-@app.route('/prediction', methods=['POST'])
+@app.route('/test', methods=['POST'])
 def prediction():
     local_path, filename = save_to_disk(request.data)
     client.upload_sync(remote_path=BASE_PATH + filename, local_path=local_path + filename)
     return json.dumps({"ok": True})
 
 
-@app.route('/upload/<sentiment>', methods=['POST'])
+@app.route('/train/<sentiment>', methods=['POST'])
 def upload_file(sentiment=None):
     remote_path = None
     local_path, filename = save_to_disk(request.data)
