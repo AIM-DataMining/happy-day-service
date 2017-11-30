@@ -2,6 +2,7 @@ import time
 from flask import Flask
 from flask import request
 from flask import json
+import io
 import webdav.client as wc
 
 app = Flask(__name__)
@@ -39,7 +40,7 @@ def images(sentiment=None):
 
 @app.route('/test', methods=['POST'])
 def prediction():
-    local_path, filename = save_to_disk(request.data)
+    local_path, filename = save_to_disk(request.files['photo'].strea)
     client.upload_sync(remote_path=BASE_PATH + filename, local_path=local_path + filename)
     return json.dumps({"ok": True})
 
@@ -47,7 +48,7 @@ def prediction():
 @app.route('/train/<sentiment>', methods=['POST'])
 def upload_file(sentiment=None):
     remote_path = None
-    local_path, filename = save_to_disk(request.data)
+    local_path, filename = save_to_disk(request.files['photo'].stream)
     if sentiment == "sad":
         remote_path = BASE_PATH + "sad/" + filename
     elif sentiment == "smile":
@@ -67,11 +68,17 @@ def retrain(sentiment):
         pass # TODO call retrain method
     return json.dumps({"ok": True})
 
+@app.route("/upload", methods=["POST"])
+def upload():
+    uploaded_files = request.files['photo'].stream
+    print(uploaded_files)
+    return ""
+
 
 def save_to_disk(data):
     filename = str(int(time.time())) + ".jpg"
-    path = "tmp/"
+    path = "/tmp/"
     with open(path + filename, 'wb') as f:
-        f.write(data)
+        f.write(data.read())
         f.close()
     return path, filename
