@@ -2,6 +2,7 @@ import time
 from flask import Flask
 from flask import request
 from flask import json
+import os
 import io
 import webdav.client as wc
 
@@ -55,6 +56,7 @@ def upload_file(sentiment=None):
         remote_path = BASE_PATH + "smile/" + filename
     if remote_path is not None:
         client.upload_sync(remote_path=remote_path, local_path=local_path + filename)
+        remove_from_disk(localpath + filename)
         return json.dumps({"ok": True})
     else:
         return json.dumps({"ok": False})
@@ -82,3 +84,10 @@ def save_to_disk(data):
         f.write(data.read())
         f.close()
     return path, filename
+
+def remove_from_disk(filename):
+    try:
+        os.remove(filename)
+        return True
+    except:
+        return False
