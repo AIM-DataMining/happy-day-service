@@ -56,7 +56,7 @@ def upload_file(sentiment=None):
         remote_path = BASE_PATH + "smile/" + filename
     if remote_path is not None:
         client.upload_sync(remote_path=remote_path, local_path=local_path + filename)
-        remove_from_disk(localpath + filename)
+        remove_from_disk(local_path + filename)
         return json.dumps({"ok": True})
     else:
         return json.dumps({"ok": False})
