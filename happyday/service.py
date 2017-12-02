@@ -54,6 +54,16 @@ def upload_file(sentiment=None):
         remote_path = BASE_PATH + "sad/" + filename
     elif sentiment == "smile":
         remote_path = BASE_PATH + "smile/" + filename
+    elif sentiment == "sleep":
+        remote_path = BASE_PATH + "sleep/" + filename
+    elif sentiment == "kiss":
+        remote_path = BASE_PATH + "kiss/" + filename
+    elif sentiment == "neutral":
+        remote_path = BASE_PATH + "neutral/" + filename
+    elif sentiment == "angry":
+        remote_path = BASE_PATH + "angry/" + filename
+    elif sentiment == "surprised":
+        remote_path = BASE_PATH + "surprised/" + filename
     if remote_path is not None:
         client.upload_sync(remote_path=remote_path, local_path=local_path + filename)
         remove_from_disk(local_path + filename)
