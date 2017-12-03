@@ -6,6 +6,8 @@ import os
 import io
 import webdav.client as wc
 
+from label_image import label_photo
+
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 Mb limit
 
@@ -41,9 +43,11 @@ def images(sentiment=None):
 
 @app.route('/test', methods=['POST'])
 def prediction():
-    local_path, filename = save_to_disk(request.files['photo'].strea)
-    client.upload_sync(remote_path=BASE_PATH + filename, local_path=local_path + filename)
-    return json.dumps({"ok": True})
+    local_path, filename = save_to_disk(request.files['photo'].stream)
+    # client.upload_sync(remote_path=BASE_PATH + filename, local_path=local_path + filename)
+    result = label_photo(local_path + filename)
+    remove_from_disk(local_path + filename)
+    return json.dumps(result)
 
 
 @app.route('/train/<sentiment>', methods=['POST'])
@@ -79,13 +83,6 @@ def retrain(sentiment):
     elif sentiment == "smile":
         pass # TODO call retrain method
     return json.dumps({"ok": True})
-
-@app.route("/upload", methods=["POST"])
-def upload():
-    uploaded_files = request.files['photo'].stream
-    print(uploaded_files)
-    return ""
-
 
 def save_to_disk(data):
     filename = str(int(time.time())) + ".jpg"

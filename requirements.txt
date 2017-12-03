@@ -1,2 +1,4 @@
 flask
 webdavclient
+numpy
+tensorflow
