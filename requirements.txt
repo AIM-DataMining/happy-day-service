@@ -1,4 +1,5 @@
+scikit-learn
 flask
 webdavclient
 numpy
-tensorflow
+tensorflow == 1.4.0
