@@ -1,15 +1,10 @@
   language: python
+  env:
+    - FLASK_APP=happyday/service.py
   python:
     - 3.5
     - nightly
   script:
-    - curl 0.0.0.0
-  services:
-    - docker
-    - git
-
-  bevore_install: 
-    - docker build -t happyday-image .
-    - docker run -d -p 80:5000 -name happyday happyday-image
-    - docker ps -a
+    - flask run
+    - curl localhost:5000
 
