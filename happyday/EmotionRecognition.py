@@ -3,9 +3,8 @@ from __future__ import division, absolute_import
 from os.path import isfile
 from Constants import *
 
-from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D
-from keras.layers import Activation, Dropout, Flatten, Dense
+from tensorflow import keras as k
+import tensorflow as tf
 
 class EmotionRecognition:
 
@@ -16,26 +15,26 @@ class EmotionRecognition:
 
     print('Building the CNN model')
     #Model
-    self.model = Sequential()
-    self.model.add(Conv2D(32, 3, 3, border_mode='same', activation='relu', input_shape=(1, 48, 48)))
-    self.model.add(Conv2D(32, 3, 3, border_mode='same', activation='relu'))
-    self.model.add(Conv2D(32, 3, 3, border_mode='same', activation='relu'))
-    self.model.add(MaxPooling2D(pool_size=(2, 2)))
+    self.model = k.models.Sequential()
+    self.model.add(k.layers.Conv2D(32, 3, 3, border_mode='same', activation='relu', input_shape=(1, 48, 48)))
+    self.model.add(k.layers.Conv2D(32, 3, 3, border_mode='same', activation='relu'))
+    self.model.add(k.layers.Conv2D(32, 3, 3, border_mode='same', activation='relu'))
+    self.model.add(k.layers.MaxPooling2D(pool_size=(2, 2)))
 
-    self.model.add(Conv2D(64, 3, 3, border_mode='same', activation='relu'))
-    self.model.add(Conv2D(64, 3, 3, border_mode='same', activation='relu'))
-    self.model.add(Conv2D(64, 3, 3, border_mode='same', activation='relu'))
-    self.model.add(MaxPooling2D(pool_size=(2, 2)))
+    self.model.add(k.layers.Conv2D(64, 3, 3, border_mode='same', activation='relu'))
+    self.model.add(k.layers.Conv2D(64, 3, 3, border_mode='same', activation='relu'))
+    self.model.add(k.layers.Conv2D(64, 3, 3, border_mode='same', activation='relu'))
+    self.model.add(k.layers.MaxPooling2D(pool_size=(2, 2)))
 
-    self.model.add(Conv2D(128, 3, 3, border_mode='same', activation='relu'))
-    self.model.add(Conv2D(128, 3, 3, border_mode='same', activation='relu'))
-    self.model.add(Conv2D(128, 3, 3, border_mode='same', activation='relu'))
-    self.model.add(MaxPooling2D(pool_size=(2, 2)))
+    self.model.add(k.layers.Conv2D(128, 3, 3, border_mode='same', activation='relu'))
+    self.model.add(k.layers.Conv2D(128, 3, 3, border_mode='same', activation='relu'))
+    self.model.add(k.layers.Conv2D(128, 3, 3, border_mode='same', activation='relu'))
+    self.model.add(k.layers.MaxPooling2D(pool_size=(2, 2)))
 
-    self.model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
-    self.model.add(Dense(64, activation='relu'))
-    self.model.add(Dense(64, activation='relu'))
-    self.model.add(Dense(2, activation='softmax'))
+    self.model.add(k.layers.Flatten())  # this converts our 3D feature maps to 1D feature vectors
+    self.model.add(k.layers.Dense(64, activation='relu'))
+    self.model.add(k.layers.Dense(64, activation='relu'))
+    self.model.add(k.layers.Dense(2, activation='softmax'))
 
     print('Compile the model')
     self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
@@ -71,29 +70,33 @@ class EmotionRecognition:
     print(' Acc: ', loss_and_metrics[1])
 
     # model logging:
-    notes = 'medium set 100'
-    save_model(model.to_json(), './Models/')
-    save_config(model.get_config(), './Models/')
-    save_result(loss_and_metrics, notes, './Models/')
+    #notes = 'medium set 100'
+    #self.save_model(self.model.to_json(), './Models/')
+    #self.save_config(self.model.get_config(), './Models/')
+    #self.save_result(loss_and_metrics, notes, './Models/')
 
-  def generate_test_data(self, batch_size)
+  def generate_test_data(self, batch_size):
     test_set = 0
     validation_set = 0
 
-    train_samples, validation_samples = train_test_split(Image_List, test_size=0.2)
+    import sklearn.model_selection as sk
+
+    # TODO train and testset spit
+    # train_samples, validation_samples = sk.train_test_split(Image_List, test_size=0.2)
 
     # Load the training data
 
     # this is the augmentation configuration we will use for training
-    train_datagen = ImageDataGenerator(
+    train_datagen = k.preprocessing.image.ImageDataGenerator(
       rescale=1. / 255,
       shear_range=0.2,
       zoom_range=0.2,
       horizontal_flip=True)
 
+
     # this is the augmentation configuration we will use for testing:
     # only rescaling
-    test_datagen = ImageDataGenerator(rescale=1. / 255)
+    test_datagen = k.preprocessing.image.ImageDataGenerator(rescale=1. / 255)
 
     # this is a generator that will read pictures found in
     # subfolers of 'Images', and indefinitely generate
