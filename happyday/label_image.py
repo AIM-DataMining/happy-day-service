@@ -100,9 +100,9 @@ def label_photo(file_name):
   labels = load_labels(label_file)
 
   print('\nEvaluation time (1-image): {:.3f}s\n'.format(end-start))
-  reslutdict = {}
+  resultdict = {}
   for i in top_k:
     print(labels[i], results[i])
-    reslutdict[labels[i]] = results[i].item()
-
-  return reslutdict
+    resultdict[labels[i]] = results[i].item()
+  resultdict['model'] = 'InceptionV3'
+  return resultdict

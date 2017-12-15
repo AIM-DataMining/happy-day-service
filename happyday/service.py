@@ -47,7 +47,7 @@ def prediction():
     # client.upload_sync(remote_path=BASE_PATH + filename, local_path=local_path + filename)
     result = label_photo(local_path + filename)
     remove_from_disk(local_path + filename)
-    return json.dumps(result)
+    return json.dumps([result])
 
 
 @app.route('/train/<sentiment>', methods=['POST'])
