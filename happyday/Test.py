@@ -46,7 +46,9 @@ def format_image(image):
 def testloop(filename):
     # Initialize object of EMR class
     network = EmotionRecognition()
-    network.build_network(filename)
+    network.build_network()
+    #Load the model from the file
+    network.load_model(filename)
 
     cap = cv2.VideoCapture(0)
     font = cv2.FONT_HERSHEY_SIMPLEX
@@ -60,8 +62,8 @@ def testloop(filename):
         # Again find haar cascade to draw bounding box around face
         ret, frame = cap.read()
         facecasc = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = facecasc.detectMultiScale(gray, 1.3, 5)
+        #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        faces = facecasc.detectMultiScale(frame, 1.3, 5)
 
         # compute softmax probabilities
         result = network.predict(format_image(frame))
@@ -110,7 +112,7 @@ def testloop(filename):
     cap.release()
     cv2.destroyAllWindows()
 
-
+#Entry of the appllication
 if __name__ == "__main__":
   if len(sys.argv) <= 1:
     exit(0)
@@ -119,6 +121,6 @@ if __name__ == "__main__":
     network = EmotionRecognition()
     network.full_training()
     network.save_model(sys.argv[2])
-    print('Training finished')
+    print('Training finished and model saved')
   elif sys.argv[1] == 'testloop':
       testloop(sys.argv[2])

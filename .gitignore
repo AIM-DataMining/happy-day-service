@@ -107,5 +107,5 @@ venv.bak/
 .idea/
 .vscode
 
-/happyday/Images/*
+/happyday/data/*
 /happyday/Models/*
