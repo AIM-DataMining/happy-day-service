@@ -1,16 +1,22 @@
-import tensorflow as tf
 import tensorflow.contrib.keras as k
+import time
 from tensorflow.contrib.keras import layers, models, optimizers
-
+import numpy as np
+from PIL import Image
 from matplotlib import pyplot as plt
 
 target_size = (48, 48)
 input_shape = (48, 48, 3)
+
 train_data_gen = k.preprocessing.image.ImageDataGenerator(
     rescale=1./255.
 )
 
 test_data_gen = k.preprocessing.image.ImageDataGenerator(
+    rescale=1./255.
+)
+
+eval_data_gen = k.preprocessing.image.ImageDataGenerator(
     rescale=1./255.
 )
 
@@ -57,11 +63,21 @@ tbCallBack = k.callbacks.TensorBoard(
 
 model.fit_generator(
     train_gen,
-    steps_per_epoch=200,
-    epochs=20,
+    steps_per_epoch=20,
+    epochs=5,
     validation_data=test_gen,
-    validation_steps=100
     validation_steps=10,
     callbacks=[tbCallBack]
 )
-score = model.evaluate_generator(train_gen, steps=32)
+score = model.evaluate_generator(train_gen, steps=10)
+
+img1 = Image.open("data/eval/oli_smile.jpg")
+img1 = np.asarray(img1.resize(target_size))
+
+img2 = Image.open("data/eval/1512140380.jpg")
+img2 = np.asarray(img2.resize(target_size))
+predictions = model.predict_on_batch(np.asarray([img1, img2]))
+
+model.save("tf_files/self-cnn")
+
+print(predictions)
