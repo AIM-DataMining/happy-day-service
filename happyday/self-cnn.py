@@ -4,6 +4,8 @@ from tensorflow.contrib.keras import layers, models, optimizers
 
 from matplotlib import pyplot as plt
 
+target_size = (48, 48)
+input_shape = (48, 48, 3)
 train_data_gen = k.preprocessing.image.ImageDataGenerator(
     rescale=1./255.
 )
@@ -14,22 +16,22 @@ test_data_gen = k.preprocessing.image.ImageDataGenerator(
 
 train_gen = train_data_gen.flow_from_directory(
     "data/train",
-    target_size=(150, 150),
+    target_size=target_size,
     batch_size=32,
     class_mode="categorical"
 )
 
 test_gen = test_data_gen.flow_from_directory(
     "data/test",
-    target_size=(150, 150),
+    target_size=target_size,
     batch_size=32,
     class_mode="categorical"
 )
 
 model = models.Sequential()
 
-model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(150, 150, 3)))
-model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(150, 150, 3)))
+model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=input_shape))
+model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=input_shape))
 model.add(layers.MaxPooling2D(pool_size=(2, 2)))
 model.add(layers.Dropout(0.25))
 
