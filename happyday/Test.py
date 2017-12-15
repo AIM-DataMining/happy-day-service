@@ -7,10 +7,6 @@ import numpy as np
 
 cascade_classifier = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
-def brighten(data,b):
-     datab = data * b
-     return datab
-
 def format_image(image):
     if len(image.shape) > 2 and image.shape[2] == 3:
         # determine whether the image is color
@@ -36,17 +32,17 @@ def format_image(image):
 
     try:
         # resize the image so that it can be passed to the neural network
-        image = cv2.resize(image, (48,48), interpolation = cv2.INTER_CUBIC) / 255.
+        image = cv2.resize(image, (SIZE_FACE,SIZE_FACE), interpolation = cv2.INTER_CUBIC) / 255.
     except Exception:
         print("----->Problem during resize")
         return None
 
     return image
 
-def testloop(filename):
+def testloop(filename, model_number):
     # Initialize object of EMR class
     network = EmotionRecognition()
-    network.build_network()
+    network.build_network(model_number)
     #Load the model from the file
     network.load_model(filename)
 
@@ -59,26 +55,25 @@ def testloop(filename):
         feelings_faces.append(cv2.imread(EMOJIS_FOLDER + emotion + '.png', -1))
 
     while True:
-        # Again find haar cascade to draw bounding box around face
+        #Read a image from the stream
         ret, frame = cap.read()
-        facecasc = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-        #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = facecasc.detectMultiScale(frame, 1.3, 5)
 
-        # compute softmax probabilities
+        #Find the face in the image an cut it out
+        facecasc = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        faces = facecasc.detectMultiScale(gray, 1.3, 5)
+
+        #Compute the proabilities for emotions
         result = network.predict(format_image(frame))
+
         if result is not None:
-            if result[0][6] < 0.6:
-                result[0][6] = result[0][6] - 0.12
-                result[0][:3] += 0.01
-                result[0][4:5] += 0.04
-            # write the different emotions and have a bar to indicate probabilities for each class
+            #Write the different emotions with a bar shown the proability
             for index, emotion in enumerate(EMOTIONS):
                 cv2.putText(frame, emotion, (10, index * 20 + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1);
                 cv2.rectangle(frame, (130, index * 20 + 10), (130 + int(result[0][index] * 100), (index + 1) * 20 + 4),
                               (255, 0, 0), -1)
 
-            # find the emotion with maximum probability and display it
+            #Find the emotion with the highest proability and write a Emoji in the video stream
             maxindex = np.argmax(result[0])
             font = cv2.FONT_HERSHEY_SIMPLEX
             cv2.putText(frame, EMOTIONS[maxindex], (10, 360), font, 2, (255, 255, 255), 2, cv2.LINE_AA)
@@ -112,15 +107,15 @@ def testloop(filename):
     cap.release()
     cv2.destroyAllWindows()
 
-#Entry of the appllication
+#Entry of the application
 if __name__ == "__main__":
   if len(sys.argv) <= 1:
     exit(0)
 
   if sys.argv[1] == 'train':
     network = EmotionRecognition()
-    network.full_training()
+    network.full_training(sys.argv[3])
     network.save_model(sys.argv[2])
     print('Training finished and model saved')
   elif sys.argv[1] == 'testloop':
-      testloop(sys.argv[2])
+      testloop(sys.argv[2], sys.argv[3])
