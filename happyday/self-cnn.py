@@ -1,83 +1,119 @@
 import tensorflow.contrib.keras as k
 import time
+from PIL import Image
 from tensorflow.contrib.keras import layers, models, optimizers
 import numpy as np
-from PIL import Image
-from matplotlib import pyplot as plt
 
-target_size = (48, 48)
-input_shape = (48, 48, 3)
 
-train_data_gen = k.preprocessing.image.ImageDataGenerator(
-    rescale=1./255.
-)
+class SelfCnn:
 
-test_data_gen = k.preprocessing.image.ImageDataGenerator(
-    rescale=1./255.
-)
+    target_size = None
+    input_shape = None
+    save_dir = None
 
-eval_data_gen = k.preprocessing.image.ImageDataGenerator(
-    rescale=1./255.
-)
+    def __init__(self, save_dir="runs/"):
+        self.target_size = (64, 64)
+        self.input_shape = (64, 64, 1)
+        self.save_dir = save_dir + str(round(time.time() * 1000))
 
-train_gen = train_data_gen.flow_from_directory(
-    "data/train",
-    target_size=target_size,
-    batch_size=32,
-    class_mode="categorical"
-)
+    def train(self):
 
-test_gen = test_data_gen.flow_from_directory(
-    "data/test",
-    target_size=target_size,
-    batch_size=32,
-    class_mode="categorical"
-)
+        train_data_gen = k.preprocessing.image.ImageDataGenerator(
+            rescale=1./255.,
+            shear_range=0.5,
+            zoom_range=0.01,
+            horizontal_flip=False
+        )
 
-model = models.Sequential()
+        test_data_gen = k.preprocessing.image.ImageDataGenerator(
+            rescale=1./255.
+        )
 
-model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=input_shape))
-model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=input_shape))
-model.add(layers.MaxPooling2D(pool_size=(2, 2)))
-model.add(layers.Dropout(0.25))
+        train_gen = train_data_gen.flow_from_directory(
+            "data/train",
+            target_size=self.target_size,
+            batch_size=32,
+            class_mode="categorical",
+            color_mode="grayscale"
+        )
 
-model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-model.add(layers.MaxPooling2D(pool_size=(2, 2)))
-model.add(layers.Dropout(0.25))
+        validation_gen = test_data_gen.flow_from_directory(
+            "data/test",
+            target_size=self.target_size,
+            batch_size=8,
+            class_mode="categorical",
+            color_mode="grayscale"
+        )
 
-model.add(layers.Flatten())
-model.add(layers.Dense(256, activation='relu'))
-model.add(layers.Dropout(0.5))
-model.add(layers.Dense(2, activation='softmax'))
+        eval_gen = test_data_gen.flow_from_directory(
+            "data/eval",
+            target_size=self.target_size,
+            batch_size=1,
+            class_mode="categorical",
+            color_mode="grayscale"
+        )
 
-adam = optimizers.Adam()
-model.compile(loss='categorical_crossentropy', optimizer=adam)
+        model = models.Sequential()
 
-tbCallBack = k.callbacks.TensorBoard(
-    log_dir='./Graph/'+str(round(time.time() * 1000)),
-    histogram_freq=0,
-    write_graph=True,
-    write_images=True
-)
+        model.add(layers.Conv2D(64, (5, 5), activation='relu', input_shape=self.input_shape))
+        model.add(layers.Conv2D(64, (5, 5), activation='relu', input_shape=self.input_shape))
+        model.add(layers.MaxPooling2D(pool_size=(3, 3), strides=(2, 2)))
+        model.add(layers.Dropout(0.25))
 
-model.fit_generator(
-    train_gen,
-    steps_per_epoch=20,
-    epochs=5,
-    validation_data=test_gen,
-    validation_steps=10,
-    callbacks=[tbCallBack]
-)
-score = model.evaluate_generator(train_gen, steps=10)
+        model.add(layers.Conv2D(64, (5, 5), activation='relu'))
+        model.add(layers.Conv2D(64, (5, 5), activation='relu'))
+        model.add(layers.MaxPooling2D(pool_size=(3, 3), strides=(2, 2)))
+        model.add(layers.Dropout(0.25))
 
-img1 = Image.open("data/eval/oli_smile.jpg")
-img1 = np.asarray(img1.resize(target_size))
+        model.add(layers.Conv2D(128, (4, 4), activation='relu'))
+        #model.add(layers.MaxPooling2D(pool_size=(2, 2)))
+        model.add(layers.Dropout(0.25))
 
-img2 = Image.open("data/eval/1512140380.jpg")
-img2 = np.asarray(img2.resize(target_size))
-predictions = model.predict_on_batch(np.asarray([img1, img2]))
+        model.add(layers.Flatten())
+        model.add(layers.Dense(3072, activation='relu'))
+        model.add(layers.Dropout(0.5))
+        model.add(layers.Dense(128, activation='relu'))
+        model.add(layers.Dropout(0.5))
+        model.add(layers.Dense(3, activation='softmax'))
 
-model.save("tf_files/self-cnn")
+        adam = optimizers.Adam()
+        model.compile(loss='categorical_crossentropy', optimizer=adam)
 
-print(predictions)
+        tbCallBack = k.callbacks.TensorBoard(
+            log_dir=self.save_dir,
+            histogram_freq=0,
+            write_grads=1,
+            write_graph=True,
+            write_images=True
+        )
+
+        model.fit_generator(
+            train_gen,
+            steps_per_epoch=2,
+            epochs=1,
+            validation_data=validation_gen,
+            validation_steps=10,
+            callbacks=[tbCallBack]
+        )
+
+        score = model.evaluate_generator(eval_gen, steps=10)
+
+        print(model.metrics_names)
+
+    def predict(self, model, path):
+        img = Image.open(path).convert('LA')
+        img_ = np.asarray(img.resize(self.target_size))
+        img_np = np.array([img_]).T
+        return model.predict_on_batch(img_np)
+
+    def save(self, model, path):
+        model.save(path)
+
+
+#model.save(save_dir + "/model-self-cnn.hdf5")
+
+#plt.figure()
+#plt.imshow(img)
+#plt.show()
+#print(predictions_gen)
+#print(predictions_files)
