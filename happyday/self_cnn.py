@@ -5,18 +5,19 @@ from tensorflow.contrib.keras import layers, models, optimizers
 import numpy as np
 
 
-class SelfCnn:
+class SelfCNN:
 
     target_size = None
     input_shape = None
     save_dir = None
+    model = None
 
     def __init__(self, save_dir="runs/"):
         self.target_size = (64, 64)
         self.input_shape = (64, 64, 1)
         self.save_dir = save_dir + str(round(time.time() * 1000))
 
-    def train(self):
+    def train(self, steps=20, epochs=50):
 
         train_data_gen = k.preprocessing.image.ImageDataGenerator(
             rescale=1./255.,
@@ -53,31 +54,31 @@ class SelfCnn:
             color_mode="grayscale"
         )
 
-        model = models.Sequential()
+        self.model = models.Sequential()
 
-        model.add(layers.Conv2D(64, (5, 5), activation='relu', input_shape=self.input_shape))
-        model.add(layers.Conv2D(64, (5, 5), activation='relu', input_shape=self.input_shape))
-        model.add(layers.MaxPooling2D(pool_size=(3, 3), strides=(2, 2)))
-        model.add(layers.Dropout(0.25))
+        self.model.add(layers.Conv2D(64, (5, 5), activation='relu', input_shape=self.input_shape))
+        self.model.add(layers.Conv2D(64, (5, 5), activation='relu', input_shape=self.input_shape))
+        self.model.add(layers.MaxPooling2D(pool_size=(3, 3), strides=(2, 2)))
+        self.model.add(layers.Dropout(0.25))
 
-        model.add(layers.Conv2D(64, (5, 5), activation='relu'))
-        model.add(layers.Conv2D(64, (5, 5), activation='relu'))
-        model.add(layers.MaxPooling2D(pool_size=(3, 3), strides=(2, 2)))
-        model.add(layers.Dropout(0.25))
+        self.model.add(layers.Conv2D(64, (5, 5), activation='relu'))
+        self.model.add(layers.Conv2D(64, (5, 5), activation='relu'))
+        self.model.add(layers.MaxPooling2D(pool_size=(3, 3), strides=(2, 2)))
+        self.model.add(layers.Dropout(0.25))
 
-        model.add(layers.Conv2D(128, (4, 4), activation='relu'))
+        self.model.add(layers.Conv2D(128, (4, 4), activation='relu'))
         #model.add(layers.MaxPooling2D(pool_size=(2, 2)))
-        model.add(layers.Dropout(0.25))
+        self.model.add(layers.Dropout(0.25))
 
-        model.add(layers.Flatten())
-        model.add(layers.Dense(3072, activation='relu'))
-        model.add(layers.Dropout(0.5))
-        model.add(layers.Dense(128, activation='relu'))
-        model.add(layers.Dropout(0.5))
-        model.add(layers.Dense(3, activation='softmax'))
+        self.model.add(layers.Flatten())
+        self.model.add(layers.Dense(3072, activation='relu'))
+        self.model.add(layers.Dropout(0.5))
+        self.model.add(layers.Dense(128, activation='relu'))
+        self.model.add(layers.Dropout(0.5))
+        self.model.add(layers.Dense(3, activation='softmax'))
 
         adam = optimizers.Adam()
-        model.compile(loss='categorical_crossentropy', optimizer=adam)
+        self.model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['mae', 'acc'])
 
         tbCallBack = k.callbacks.TensorBoard(
             log_dir=self.save_dir,
@@ -87,33 +88,37 @@ class SelfCnn:
             write_images=True
         )
 
-        model.fit_generator(
+        self.model.fit_generator(
             train_gen,
-            steps_per_epoch=2,
-            epochs=1,
+            steps_per_epoch=steps,
+            epochs=epochs,
             validation_data=validation_gen,
             validation_steps=10,
             callbacks=[tbCallBack]
         )
 
-        score = model.evaluate_generator(eval_gen, steps=10)
+        score = self.model.evaluate_generator(eval_gen, steps=10)
 
-        print(model.metrics_names)
+        print(self.model.metrics_names)
 
-    def predict(self, model, path):
+    def predict(self, path):
         img = Image.open(path).convert('LA')
         img_ = np.asarray(img.resize(self.target_size))
         img_np = np.array([img_]).T
-        return model.predict_on_batch(img_np)
+        return self.model.predict_on_batch(img_np)
 
-    def save(self, model, path):
-        model.save(path)
+    def save(self, path):
+        self.model.save(path)
+
+    def load(self, path):
+        self.model = k.models.load_model(path)
 
 
-#model.save(save_dir + "/model-self-cnn.hdf5")
+if __name__ == "__main__":
+    cnn = SelfCNN()
+    cnn.load("runs/1513535046095/model-self-cnn.hdf5")
+    cnn.train(steps=20, epochs=20)
+    cnn.save(cnn.save_dir + "/model-self-cnn.hdf5")
+    pred = cnn.predict("data/eval/sad/1512140526.jpg")
 
-#plt.figure()
-#plt.imshow(img)
-#plt.show()
-#print(predictions_gen)
-#print(predictions_files)
+    print(pred)
