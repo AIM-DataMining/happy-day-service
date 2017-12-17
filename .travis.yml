@@ -2,5 +2,15 @@
   python:
     - 3.5
     - nightly
+
+  services:
+    - docker
+    - git
+
+  bevore_install:
+    - docker build -t happyday-image .
+    - docker run -d -p 8080:5000 -name happyday happyday-image
+    - docker ps -a
+
   script:
-    - pytest
+    - curl localhost:8080
