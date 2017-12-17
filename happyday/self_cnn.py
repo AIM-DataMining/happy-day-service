@@ -105,7 +105,9 @@ class SelfCNN:
         img = Image.open(path).convert('LA')
         img_ = np.asarray(img.resize(self.target_size))
         img_np = np.array([img_]).T
-        return self.model.predict_on_batch(img_np)
+        pred = self.model.predict_on_batch(img_np)
+        print(pred)
+        return {"self_cnn": pred.tolist()}
 
     def save(self, path):
         self.model.save(path)

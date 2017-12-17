@@ -7,6 +7,7 @@ import io
 import webdav.client as wc
 
 from label_image import label_photo
+from self_cnn import SelfCNN
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 Mb limit
@@ -22,6 +23,10 @@ webdav_options = {
 }
 
 client = wc.Client(webdav_options)
+
+self_cnn = SelfCNN()
+self_cnn.load("happyday/runs/1513535046095/model-self-cnn.hdf5")
+
 
 @app.route('/')
 def hello_world():
@@ -46,8 +51,9 @@ def prediction():
     local_path, filename = save_to_disk(request.files['photo'].stream)
     # client.upload_sync(remote_path=BASE_PATH + filename, local_path=local_path + filename)
     result = label_photo(local_path + filename)
+    result_self_cnn = self_cnn.predict(local_path + filename)
     remove_from_disk(local_path + filename)
-    return json.dumps([result])
+    return json.dumps([result, result_self_cnn])
 
 
 @app.route('/train/<sentiment>', methods=['POST'])
