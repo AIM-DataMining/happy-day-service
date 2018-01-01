@@ -102,12 +102,16 @@ class SelfCNN:
         print(self.model.metrics_names)
 
     def predict(self, path):
-        img = Image.open(path).convert('LA')
+        img = Image.open(path).convert('L')
         img_ = np.asarray(img.resize(self.target_size))
-        img_np = np.array([img_]).T
-        pred = self.model.predict_on_batch(img_np)
+        img_np = np.array([np.array([img_]).T])
+        print(np.shape(img_np))
+        pred = self.model.predict_on_batch(img_np).tolist()
         print(pred)
-        return {"self_cnn": pred.tolist()}
+        return {"model": "self_cnn",
+                "sad": pred[0][0],
+                "smile": pred[0][1],
+                "neutral": pred[0][2]}
 
     def save(self, path):
         self.model.save(path)
