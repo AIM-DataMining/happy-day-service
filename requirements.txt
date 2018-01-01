@@ -1,6 +1,6 @@
 Flask >= 0.12
 webdavclient
 numpy >= 1.13
-tensorflow == 1.4
+tensorflow >= 1.4
 Pillow > 4.0
 h5py >= 2.7
