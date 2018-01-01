@@ -56,6 +56,30 @@ def prediction():
     return json.dumps([result, result_self_cnn])
 
 
+@app.route('/self-test/<sentiment>', methods=['GET'])
+def self_test(sentiment):
+    result, result_self_cnn = self_test_eval(sentiment)
+    return json.dumps([result, result_self_cnn])
+
+
+def self_test_eval(sentiment):
+    filename = ""
+    if sentiment == "sad":
+        filename = "sad.jpg"
+    elif sentiment == "smile":
+        filename = "smile.jpg"
+    elif sentiment == "neutral":
+        filename = "neutral.jpg"
+
+    if filename == "":
+        return None, None
+
+    local_path = "happyday/data/"  # save_to_disk(request.files['photo'].stream)
+    result = label_photo(local_path + filename)
+    result_self_cnn = self_cnn.predict(local_path + filename)
+    return result, result_self_cnn
+
+
 @app.route('/train/<sentiment>', methods=['POST'])
 def upload_file(sentiment=None):
     remote_path = None
@@ -90,6 +114,7 @@ def retrain(sentiment):
         pass # TODO call retrain method
     return json.dumps({"ok": True})
 
+
 def save_to_disk(data):
     filename = str(int(time.time())) + ".jpg"
     path = "/tmp/"
@@ -97,6 +122,7 @@ def save_to_disk(data):
         f.write(data.read())
         f.close()
     return path, filename
+
 
 def remove_from_disk(filename):
     try:
