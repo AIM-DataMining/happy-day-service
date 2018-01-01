@@ -15,4 +15,4 @@
     - docker ps -a
 
   script:
-    - curl localhost:8080
+    - pytest
