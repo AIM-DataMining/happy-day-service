@@ -3,6 +3,8 @@
     - 3.5
     - nightly
 
+  sudo: required
+
   services:
     - docker
     - git
