@@ -1,4 +1,5 @@
   language: python
+
   python:
     - 3.5
     - nightly
@@ -9,10 +10,15 @@
     - docker
     - git
 
-  bevore_install:
+  install:
     - docker build -t happyday-image .
     - docker run -d -p 8080:5000 -name happyday happyday-image
-    - docker ps -a
+
+  bevore_install:
+    - docker run -ti happyday-image
 
   script:
+    - docker ps | grep -q happyday
+    - docker run happyday-image /bin/bash -c "pytest"
     - pytest
+
