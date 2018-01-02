@@ -1,9 +1,9 @@
+import logging
 import time
 from flask import Flask
 from flask import request
 from flask import json
 import os
-import io
 import webdav.client as wc
 
 from label_image import label_photo
@@ -16,16 +16,41 @@ app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 Mb limit
 BASE_PATH = "/happy-day/"
 
 webdav_options = {
-    'webdav_hostname': "https://schrolm.de/nextcloud/remote.php/webdav/",
+    'webdav_hostname': "https://schrolm.de",
     'webdav_login': "dm",
-    'webdav_password': "Just Smile!",
+    'webdav_password': "rd92c-wPkPi-TG2ta-wCZfo-fbR8n",
+    'webdav_root': "/remote.php/webdav",
     'verbose': False
 }
 
 client = wc.Client(webdav_options)
 
-self_cnn = SelfCNN()
-self_cnn.load("happyday/runs/1513535046095/model-self-cnn.hdf5")
+
+def models_availible(models, path="models"):
+    models_exist = True
+    try:
+        if not os.path.isdir(path):
+            os.mkdir(path)
+            models_exist = False
+        for model in models:
+            model_path = "{0}/{1}".format(path, model)
+            if not os.path.exists(model_path):
+                models_exist = False
+                logging.error("please copy model {0} into folder {1}".format(model, path))
+    except Exception as e:
+        logging.error(e)
+        return False
+    return models_exist
+
+
+if models_availible(["model-self-cnn.hdf5", "inception-v3-retrained.pb"]):
+    self_cnn = SelfCNN()
+    self_cnn.load("models/model-self-cnn.hdf5")
+
+    # TODO load inception model
+    # TODO load eiselec model
+else:
+    exit(1)
 
 
 @app.route('/')
@@ -36,7 +61,6 @@ def hello_world():
 @app.route('/images/')
 @app.route('/images/<sentiment>')
 def images(sentiment=None):
-    dir_list = None
     if sentiment == "sad":
         dir_list = client.list(BASE_PATH + "sad")
     elif sentiment == "smile":
@@ -109,9 +133,9 @@ def upload_file(sentiment=None):
 @app.route('/retrain/<sentiment>', methods=["POST"])
 def retrain(sentiment):
     if sentiment == "sad":
-        pass # TODO call retrain method
+        pass  # TODO call retrain method
     elif sentiment == "smile":
-        pass # TODO call retrain method
+        pass  # TODO call retrain method
     return json.dumps({"ok": True})
 
 
