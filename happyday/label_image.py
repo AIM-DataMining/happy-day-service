@@ -55,6 +55,7 @@ def read_tensor_from_image_file(file_name, input_height=299, input_width=299,
     dims_expander = tf.expand_dims(float_caster, 0);
     resized = tf.image.resize_bilinear(dims_expander, [input_height, input_width])
     normalized = tf.divide(tf.subtract(resized, [input_mean]), [input_std])
+    print("first session")
     sess = tf.Session()
     result = sess.run(normalized)
 
@@ -69,9 +70,7 @@ def load_labels(label_file):
     return label
 
 
-def label_photo(file_name):
-    model_file = "happyday/tf_files/retrained_graph.pb"
-    label_file = "happyday/tf_files/retrained_labels.txt"
+def label_photo(file_name, graph, labels):
     input_height = 299
     input_width = 299
     input_mean = 128
@@ -79,7 +78,6 @@ def label_photo(file_name):
     input_layer = "Mul"
     output_layer = "final_result"
 
-    graph = load_graph(model_file)
     t = read_tensor_from_image_file(file_name,
                                     input_height=input_height,
                                     input_width=input_width,
@@ -99,7 +97,6 @@ def label_photo(file_name):
     results = np.squeeze(results)
 
     top_k = results.argsort()[-5:][::-1]
-    labels = load_labels(label_file)
 
     print('\nEvaluation time (1-image): {:.3f}s\n'.format(end - start))
     resultdict = {}
@@ -108,3 +105,12 @@ def label_photo(file_name):
         resultdict[labels[i]] = results[i].item()
     resultdict['model'] = 'InceptionV3'
     return resultdict
+
+
+if __name__ == "__main__":
+    _model_file = "happyday/tf_files/retrained_graph.pb"
+    _label_file = "happyday/tf_files/retrained_labels.txt"
+    _graph = load_graph(_model_file)
+    _labels = load_labels(_label_file)
+    pred = label_photo(file_name="happyday/data/smile.jpg", graph=_graph, labels=_labels)
+    print(pred)
