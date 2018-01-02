@@ -1,4 +1,7 @@
+.git/
+.travis.yml
 .cache/
 data/
 models/
+runs/
 TF_for_poets_script/

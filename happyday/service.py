@@ -76,12 +76,17 @@ def images(sentiment=None):
 
 
 @app.route('/test', methods=['POST'])
-def prediction():
+def test():
     local_path, filename = save_to_disk(request.files['photo'].stream)
-    result = inception.label_photo(file_name="local_path + filename", graph=inception_graph, labels=inception_labels)
-    result_self_cnn = self_cnn.predict(local_path + filename)
+    result, result_self_cnn = prediction(local_path=local_path, filename=filename)
     remove_from_disk(local_path + filename)
     return json.dumps([result, result_self_cnn])
+
+
+def prediction(local_path, filename):
+    result = inception.label_photo(file_name=local_path + filename, graph=inception_graph, labels=inception_labels)
+    result_self_cnn = self_cnn.predict(local_path + filename)
+    return result, result_self_cnn
 
 
 @app.route('/self-test/<sentiment>', methods=['GET'])
@@ -103,9 +108,7 @@ def self_test_eval(sentiment):
         return None, None
 
     local_path = "test/img/"  # save_to_disk(request.files['photo'].stream)
-    result = inception.label_photo(file_name=local_path + filename, graph=inception_graph, labels=inception_labels)
-    result_self_cnn = self_cnn.predict(local_path + filename)
-    return result, result_self_cnn
+    return prediction(local_path=local_path, filename=filename)
 
 
 @app.route('/train/<sentiment>', methods=['POST'])
