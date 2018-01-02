@@ -6,7 +6,7 @@ from flask import json
 import os
 import webdav.client as wc
 
-from label_image import label_photo
+import label_image as inception
 from self_cnn import SelfCNN
 
 app = Flask(__name__)
@@ -26,7 +26,7 @@ webdav_options = {
 client = wc.Client(webdav_options)
 
 
-def models_availible(models, path="models"):
+def models_available(models, path="models"):
     models_exist = True
     try:
         if not os.path.isdir(path):
@@ -43,11 +43,16 @@ def models_availible(models, path="models"):
     return models_exist
 
 
-if models_availible(["model-self-cnn.hdf5", "inception-v3-retrained.pb"]):
+if models_available(["model-self-cnn.hdf5", "inception-v3-retrained.pb"]):
+    # Self-CNN
     self_cnn = SelfCNN()
     self_cnn.load("models/model-self-cnn.hdf5")
 
-    # TODO load inception model
+    # Retrained InceptionV3
+    inception_graph = inception.load_graph("models/inception-v3-retrained.pb")
+    inception_labels = inception.load_labels("models/inception-v3-retrained_labels.txt")
+
+    # Selfmade from eisslec
     # TODO load eiselec model
 else:
     exit(1)
@@ -73,8 +78,7 @@ def images(sentiment=None):
 @app.route('/test', methods=['POST'])
 def prediction():
     local_path, filename = save_to_disk(request.files['photo'].stream)
-    # client.upload_sync(remote_path=BASE_PATH + filename, local_path=local_path + filename)
-    result = label_photo(local_path + filename)
+    result = inception.label_photo(file_name="local_path + filename", graph=inception_graph, labels=inception_labels)
     result_self_cnn = self_cnn.predict(local_path + filename)
     remove_from_disk(local_path + filename)
     return json.dumps([result, result_self_cnn])
@@ -99,7 +103,7 @@ def self_test_eval(sentiment):
         return None, None
 
     local_path = "happyday/data/"  # save_to_disk(request.files['photo'].stream)
-    result = label_photo(local_path + filename)
+    result = inception.label_photo(file_name=local_path + filename, graph=inception_graph, labels=inception_labels)
     result_self_cnn = self_cnn.predict(local_path + filename)
     return result, result_self_cnn
 
