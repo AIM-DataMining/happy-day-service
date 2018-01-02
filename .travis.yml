@@ -8,17 +8,16 @@
 
   services:
     - docker
-    - git
 
   install:
     - docker build -t happyday-image .
-    - docker run -d -p 8080:5000 -name happyday happyday-image
+    - docker run -d -p 8080:5000 --name happyday happyday-image
 
   bevore_install:
     - docker run -ti happyday-image
 
   script:
     - docker ps | grep -q happyday
-    - docker run happyday-image /bin/bash -c "pytest"
+    - docker run happyday-image /bin/bash -c "cd happyday-service; pytest"
     - pytest
 
