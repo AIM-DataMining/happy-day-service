@@ -40,6 +40,12 @@ lists all images in dir.
 ### GET `/images/<sentiment>`
 lists all images in dir `<sentiment>` only "sad" and "smile" are available
 
+### GET `/self-test/<sentiment>`
+tests models with predefined image. `<sentiment>` can be one of:
+- sad
+- smile
+- neutral
+
 ### POST `/test/`
 receives a file and moves it to webdav destination, and later for testing
 
@@ -49,3 +55,4 @@ receives a file and moves it to webdav destination, and later for training
 ### POST `/retrain/<sentiment>`
 NOT YET IMPLEMENTED, empty endpoint. Returns always `{"ok": true}`
 retrains a file for given sentiment (sad or smile)
+
