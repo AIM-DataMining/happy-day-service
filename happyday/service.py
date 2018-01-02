@@ -6,8 +6,8 @@ from flask import json
 import os
 import webdav.client as wc
 
-import label_image as inception
-from self_cnn import SelfCNN
+import happyday.label_image as inception
+from happyday.self_cnn import SelfCNN
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 Mb limit
@@ -102,7 +102,7 @@ def self_test_eval(sentiment):
     if filename == "":
         return None, None
 
-    local_path = "happyday/data/"  # save_to_disk(request.files['photo'].stream)
+    local_path = "test/img/"  # save_to_disk(request.files['photo'].stream)
     result = inception.label_photo(file_name=local_path + filename, graph=inception_graph, labels=inception_labels)
     result_self_cnn = self_cnn.predict(local_path + filename)
     return result, result_self_cnn

@@ -122,9 +122,9 @@ class SelfCNN:
 
 if __name__ == "__main__":
     cnn = SelfCNN()
-    cnn.load("runs/1513535046095/model-self-cnn.hdf5")
-    cnn.train(steps=20, epochs=20)
+    cnn.load("models/model-self-cnn.hdf5")
+    cnn.train(steps=2, epochs=2)
     cnn.save(cnn.save_dir + "/model-self-cnn.hdf5")
-    pred = cnn.predict("data/eval/sad/1512140526.jpg")
+    pred = cnn.predict("test/img/neutral.jpg")
 
     print(pred)
