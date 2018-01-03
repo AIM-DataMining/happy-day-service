@@ -23,7 +23,11 @@ class SelfCNN:
             rescale=1./255.,
             shear_range=0.5,
             zoom_range=0.01,
-            horizontal_flip=False
+            rotation_range=0.2,
+            width_shift_range=0.1,
+            height_shift_range=0.1,
+            vertical_flip=False,
+            horizontal_flip=True,
         )
 
         test_data_gen = k.preprocessing.image.ImageDataGenerator(
@@ -122,7 +126,7 @@ class SelfCNN:
 
 if __name__ == "__main__":
     cnn = SelfCNN()
-    cnn.load("models/model-self-cnn.hdf5")
+    #cnn.load("models/model-self-cnn.hdf5")
     cnn.train(steps=2, epochs=2)
     cnn.save(cnn.save_dir + "/model-self-cnn.hdf5")
     pred = cnn.predict("test/img/neutral.jpg")
