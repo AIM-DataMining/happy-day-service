@@ -11,8 +11,10 @@ clean:
 build:
 	docker build -t happyday-image .
 
-test: clean
+test:
 	docker run --rm happyday-image /bin/bash -c "cd happyday-service; pytest"
 
-deploy: clean build test
+deploy:
 	docker run -d -p 80:5000 --name happyday happyday-image
+
+all: clean build test deploy
