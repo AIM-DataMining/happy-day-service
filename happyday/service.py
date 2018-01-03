@@ -19,7 +19,7 @@ webdav_options = {
     'webdav_hostname': "https://schrolm.de",
     'webdav_login': "dm",
     'webdav_password': "rd92c-wPkPi-TG2ta-wCZfo-fbR8n",
-    'webdav_root': "/remote.php/webdav",
+    'webdav_root': "/owncloud/remote.php/webdav",
     'verbose': False
 }
 
@@ -130,6 +130,7 @@ def upload_file(sentiment=None):
     elif sentiment == "surprised":
         remote_path = BASE_PATH + "surprised/" + filename
     if remote_path is not None:
+
         client.upload_sync(remote_path=remote_path, local_path=local_path + filename)
         remove_from_disk(local_path + filename)
         return json.dumps({"ok": True})
