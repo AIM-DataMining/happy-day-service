@@ -1,7 +1,7 @@
 info:
 	@echo "clean: removes docker containers and images"
 	@echo "build: builds docker image"
-	@echo "test: runs pytest in container"
+	@echo "pytest: runs pytest in container"
 	@echo "deploy: starts container to run on server"
 	
 clean:
@@ -11,7 +11,7 @@ clean:
 build:
 	docker build -t happyday-image .
 
-test:
+pytest:
 	docker run --rm happyday-image /bin/bash -c "cd happyday-service; pytest"
 
 deploy:
