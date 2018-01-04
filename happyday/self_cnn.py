@@ -123,6 +123,6 @@ if __name__ == "__main__":
     #cnn.load("runs/1515086732388/model-self-cnn.hdf5")
     cnn.train(train_steps=400, epochs=50, data_path="/tmp/happy-day", validation_steps=10, batch_size=3)
     cnn.save(cnn.save_dir + "/model-self-cnn.hdf5")
-    pred = cnn.predict("test/img/neutral.jpg")
+    pred = cnn.predict("test/img/test/sad-woman2.jpg")
 
     print(pred)
