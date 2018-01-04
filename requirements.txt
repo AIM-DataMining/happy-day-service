@@ -1,3 +1,4 @@
+pandas
 Flask >= 0.12
 webdavclient
 numpy >= 1.13
