@@ -13,21 +13,21 @@ class SelfCNN:
     model = None
 
     def __init__(self, save_dir="runs/"):
-        self.target_size = (64, 64)
-        self.input_shape = (64, 64, 1)
+        self.target_size = (48, 48)
+        self.input_shape = (48, 48, 1)
         self.save_dir = save_dir + str(round(time.time() * 1000))
 
-    def train(self, steps=20, epochs=50):
+    def train(self, train_steps=20, epochs=50, data_path="data", validation_steps=20, batch_size=20):
 
         train_data_gen = k.preprocessing.image.ImageDataGenerator(
             rescale=1./255.,
-            shear_range=0.5,
+            shear_range=0.05,
             zoom_range=0.01,
-            rotation_range=0.2,
-            width_shift_range=0.1,
-            height_shift_range=0.1,
+            rotation_range=0.02,
+            width_shift_range=0.01,
+            height_shift_range=0.01,
             vertical_flip=False,
-            horizontal_flip=True,
+            horizontal_flip=False,
         )
 
         test_data_gen = k.preprocessing.image.ImageDataGenerator(
@@ -35,25 +35,17 @@ class SelfCNN:
         )
 
         train_gen = train_data_gen.flow_from_directory(
-            "data/train",
+            data_path + "/train",
             target_size=self.target_size,
-            batch_size=32,
+            batch_size=batch_size,
             class_mode="categorical",
             color_mode="grayscale"
         )
 
         validation_gen = test_data_gen.flow_from_directory(
-            "data/test",
+            data_path + "/test",
             target_size=self.target_size,
-            batch_size=8,
-            class_mode="categorical",
-            color_mode="grayscale"
-        )
-
-        eval_gen = test_data_gen.flow_from_directory(
-            "data/eval",
-            target_size=self.target_size,
-            batch_size=1,
+            batch_size=batch_size,
             class_mode="categorical",
             color_mode="grayscale"
         )
@@ -61,7 +53,7 @@ class SelfCNN:
         self.model = models.Sequential()
 
         self.model.add(layers.Conv2D(64, (5, 5), activation='relu', input_shape=self.input_shape))
-        self.model.add(layers.Conv2D(64, (5, 5), activation='relu', input_shape=self.input_shape))
+        self.model.add(layers.Conv2D(64, (5, 5), activation='relu'))
         self.model.add(layers.MaxPooling2D(pool_size=(3, 3), strides=(2, 2)))
         self.model.add(layers.Dropout(0.25))
 
@@ -71,7 +63,8 @@ class SelfCNN:
         self.model.add(layers.Dropout(0.25))
 
         self.model.add(layers.Conv2D(128, (4, 4), activation='relu'))
-        #model.add(layers.MaxPooling2D(pool_size=(2, 2)))
+        # self.model.add(layers.Conv2D(128, (2, 4), activation='relu'))
+        self.model.add(layers.MaxPooling2D(pool_size=(2, 2)))
         self.model.add(layers.Dropout(0.25))
 
         self.model.add(layers.Flatten())
@@ -81,8 +74,10 @@ class SelfCNN:
         self.model.add(layers.Dropout(0.5))
         self.model.add(layers.Dense(3, activation='softmax'))
 
-        adam = optimizers.Adam()
-        self.model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['mae', 'acc'])
+        adam = optimizers.Adamax()
+        self.model.compile(loss='categorical_crossentropy',
+                           optimizer=adam,
+                           metrics=['acc'])
 
         tbCallBack = k.callbacks.TensorBoard(
             log_dir=self.save_dir,
@@ -94,14 +89,12 @@ class SelfCNN:
 
         self.model.fit_generator(
             train_gen,
-            steps_per_epoch=steps,
+            steps_per_epoch=train_steps,
             epochs=epochs,
             validation_data=validation_gen,
-            validation_steps=10,
+            validation_steps=validation_steps,
             callbacks=[tbCallBack]
         )
-
-        score = self.model.evaluate_generator(eval_gen, steps=10)
 
         print(self.model.metrics_names)
 
@@ -126,8 +119,9 @@ class SelfCNN:
 
 if __name__ == "__main__":
     cnn = SelfCNN()
-    #cnn.load("models/model-self-cnn.hdf5")
-    cnn.train(steps=2, epochs=2)
+
+    #cnn.load("runs/1515086732388/model-self-cnn.hdf5")
+    cnn.train(train_steps=400, epochs=50, data_path="/tmp/happy-day", validation_steps=10, batch_size=3)
     cnn.save(cnn.save_dir + "/model-self-cnn.hdf5")
     pred = cnn.predict("test/img/neutral.jpg")
 
