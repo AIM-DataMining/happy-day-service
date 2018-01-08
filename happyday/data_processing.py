@@ -38,20 +38,35 @@ class DataPrep:
             shutil.copy(image_src, image_dest)
         return True
 
+    def asd(self, moods, count, src_path, dst_path):
+        for _mood in moods:
+            logging.info("copying mood {} to {}".format(_mood, dst_path))
+            images = dp.get_random_images(count, src_path, _mood)
+            image_sets = dp.create_self_cnn_test_sets(images, frac=0.2)
+            for i, a in enumerate(image_sets):
+                dp.copy_images(images=image_sets[i],
+                               mood=_mood,
+                               clazz=_clazzes[i],
+                               src_path=src_path,
+                               dest_path=dst_path)
+
 
 if __name__ == "__main__":
-    _path = "/home/oli/schrolmcloud/Studium/DataMining/happy-day/"
+    import argparse
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("-s", "--source", help="Data source path directory")
+    parser.add_argument("-d", "--destination", help="Data destination path directory")
+
+    args = parser.parse_args()
+
+    _src_path = args.source  # "/home/oli/schrolmcloud/Studium/DataMining/happy-day/"
+    _dst_path = args.destination  # "/tmp/happy-day/"
+
     _moods = ["smile", "sad", "neutral"]
     _clazzes = ["test", "train"]
     dp = DataPrep()
-    count = min(dp.get_pics_count(_path, _moods))
+    _count = min(dp.get_pics_count(_src_path, _moods))
+    dp.asd(_moods, _count, _src_path, _dst_path)
 
-    for _mood in _moods:
-        _images = dp.get_random_images(count, _path, _mood)
-        image_sets = dp.create_self_cnn_test_sets(_images, frac=0.2)
-        for i, a in enumerate(image_sets):
-            dp.copy_images(images=image_sets[i],
-                           mood=_mood,
-                           clazz=_clazzes[i],
-                           src_path=_path,
-                           dest_path="/tmp/happy-day/")
