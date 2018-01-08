@@ -5,8 +5,8 @@ info:
 	@echo "deploy: starts container to run on server"
 	
 clean:
-	docker rm --force happyday
-	docker rmi --force happyday-image
+	-docker rm --force happyday
+	-docker rmi --force happyday-image
 
 build:
 	docker build -t happyday-image .
