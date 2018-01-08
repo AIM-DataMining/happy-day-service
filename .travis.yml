@@ -18,4 +18,4 @@
 
   script:
     - docker ps | grep -q happyday
-    - docker run happyday-image /bin/bash -c "cd happyday-service; pytest"
+    - docker run happyday-image /bin/bash -c "pytest"
