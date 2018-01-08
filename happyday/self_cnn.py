@@ -1,7 +1,7 @@
 import tensorflow.contrib.keras as k
 import time
 from PIL import Image
-from tensorflow.contrib.keras import layers, models, optimizers
+from tensorflow.contrib.keras import layers, models, optimizers, callbacks
 import numpy as np
 
 
@@ -11,11 +11,13 @@ class SelfCNN:
     input_shape = None
     save_dir = None
     model = None
+    model_path = None
 
     def __init__(self, save_dir="runs/"):
         self.target_size = (48, 48)
         self.input_shape = (48, 48, 1)
         self.save_dir = save_dir + str(round(time.time() * 1000))
+        self.model_path = self.save_dir + "/self-cnn.{epoch:02d}-{val_loss:.2f}.hdf5"
 
     def train(self, train_steps=20, epochs=50, data_path="data", validation_steps=20, batch_size=20):
 
@@ -63,7 +65,6 @@ class SelfCNN:
         self.model.add(layers.Dropout(0.25))
 
         self.model.add(layers.Conv2D(128, (4, 4), activation='relu'))
-        # self.model.add(layers.Conv2D(128, (2, 4), activation='relu'))
         self.model.add(layers.MaxPooling2D(pool_size=(2, 2)))
         self.model.add(layers.Dropout(0.25))
 
@@ -79,12 +80,24 @@ class SelfCNN:
                            optimizer=adam,
                            metrics=['acc'])
 
-        tbCallBack = k.callbacks.TensorBoard(
+        tb_callback = callbacks.TensorBoard(
             log_dir=self.save_dir,
             histogram_freq=0,
-            write_grads=1,
             write_graph=True,
-            write_images=True
+            write_images=False,
+        )
+
+        save_callback = callbacks.ModelCheckpoint(
+            self.model_path,
+            period=10,
+            save_best_only=True
+        )
+
+        reduce_lr = callbacks.ReduceLROnPlateau(
+            monitor='val_loss',
+            factor=0.2,
+            patience=5,
+            min_lr=0.001
         )
 
         self.model.fit_generator(
@@ -93,7 +106,9 @@ class SelfCNN:
             epochs=epochs,
             validation_data=validation_gen,
             validation_steps=validation_steps,
-            callbacks=[tbCallBack]
+            callbacks=[tb_callback, save_callback, reduce_lr],
+            workers=4,
+            use_multiprocessing=True
         )
 
         print(self.model.metrics_names)
@@ -116,13 +131,34 @@ class SelfCNN:
     def load(self, path):
         self.model = k.models.load_model(path)
 
+    def evaluate(self):
+        eval_data_gen = k.preprocessing.image.ImageDataGenerator(
+            rescale=1. / 255.
+        )
+        eval_gen = eval_data_gen.flow_from_directory(
+            "data/eval",
+            target_size=self.target_size,
+            batch_size=1,
+            class_mode="categorical",
+            color_mode="grayscale"
+        )
+
+        metrics = self.model.evaluate_generator(eval_gen, steps=10)
+        return {"model": "self-cnn",
+                "metrics": metrics,
+                "names": self.model.metrics_names
+                }
+
 
 if __name__ == "__main__":
     cnn = SelfCNN()
 
-    #cnn.load("runs/1515086732388/model-self-cnn.hdf5")
-    cnn.train(train_steps=400, epochs=50, data_path="/tmp/happy-day", validation_steps=10, batch_size=3)
-    cnn.save(cnn.save_dir + "/model-self-cnn.hdf5")
-    pred = cnn.predict("test/img/test/sad-woman2.jpg")
-
-    print(pred)
+    cnn.load("models/self-cnn.209-0.25.hdf5")
+    cnn.train(train_steps=200,
+              epochs=500,
+              data_path="/home/oli/tmp/happy-day",
+              validation_steps=50,
+              batch_size=6)
+    _pred = cnn.predict("/home/oli/schrolmcloud/Studium/DataMining/happy-day/smile/IMG_6457.JPG")
+    print(_pred)
+    print(cnn.evaluate())

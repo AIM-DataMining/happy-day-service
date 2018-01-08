@@ -43,10 +43,10 @@ def models_available(models, path="models"):
     return models_exist
 
 
-if models_available(["model-self-cnn.hdf5", "inception-v3-retrained.pb"]):
+if models_available(["self-cnn.209-0.25.hdf5", "inception-v3-retrained.pb"]):
     # Self-CNN
     self_cnn = SelfCNN()
-    self_cnn.load("models/model-self-cnn.hdf5")
+    self_cnn.load("models/self-cnn.209-0.25.hdf5")
 
     # Retrained InceptionV3
     inception_graph = inception.load_graph("models/inception-v3-retrained.pb")
