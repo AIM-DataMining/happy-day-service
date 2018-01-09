@@ -55,7 +55,7 @@ class SelfCNN:
         )
         return validation_gen
 
-    def train(self, train_steps=20, epochs=50, data_path="data", validation_steps=20, batch_size=20):
+    def model_definition(self):
         self.model = models.Sequential()
 
         self.model.add(layers.Conv2D(64, (5, 5), activation='relu', input_shape=self.input_shape))
@@ -83,6 +83,9 @@ class SelfCNN:
         self.model.compile(loss='categorical_crossentropy',
                            optimizer=adam,
                            metrics=['acc'])
+
+    def train(self, train_steps=20, epochs=50, data_path="data", validation_steps=20, batch_size=20):
+        self.model_definition()
 
         tb_callback = callbacks.TensorBoard(
             log_dir=self.save_dir,
@@ -146,7 +149,6 @@ class SelfCNN:
             class_mode="categorical",
             color_mode="grayscale"
         )
-
 
         metrics = self.model.evaluate_generator(eval_gen, steps=10)
         return {"model": "self-cnn",
