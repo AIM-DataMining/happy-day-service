@@ -22,14 +22,13 @@ class SelfCNN:
     def train(self, train_steps=20, epochs=50, data_path="data", validation_steps=20, batch_size=20):
 
         train_data_gen = k.preprocessing.image.ImageDataGenerator(
-            rescale=1./255.,
-            shear_range=0.05,
-            zoom_range=0.01,
-            rotation_range=0.02,
-            width_shift_range=0.01,
-            height_shift_range=0.01,
+            rescale=1. / 255.,
+            shear_range=0.1,
+            zoom_range=0.3,
+            rotation_range=0.5,
+            width_shift_range=0.2,
+            height_shift_range=0.2,
             vertical_flip=False,
-            horizontal_flip=False,
         )
 
         test_data_gen = k.preprocessing.image.ImageDataGenerator(
