@@ -19,8 +19,7 @@ class SelfCNN:
         self.save_dir = save_dir + str(round(time.time() * 1000))
         self.model_path = self.save_dir + "/self-cnn.{epoch:02d}-{val_loss:.2f}.hdf5"
 
-    def train(self, train_steps=20, epochs=50, data_path="data", validation_steps=20, batch_size=20):
-
+    def get_train_gen(self, data_path, batch_size=20):
         train_data_gen = k.preprocessing.image.ImageDataGenerator(
             rescale=1. / 255.,
             shear_range=0.1,
@@ -29,10 +28,7 @@ class SelfCNN:
             width_shift_range=0.2,
             height_shift_range=0.2,
             vertical_flip=False,
-        )
-
-        test_data_gen = k.preprocessing.image.ImageDataGenerator(
-            rescale=1./255.
+            horizontal_flip=True,
         )
 
         train_gen = train_data_gen.flow_from_directory(
@@ -43,6 +39,13 @@ class SelfCNN:
             color_mode="grayscale"
         )
 
+        return train_gen
+
+    def get_validation_gen(self, data_path, batch_size=20):
+        test_data_gen = k.preprocessing.image.ImageDataGenerator(
+            rescale=1. / 255.
+        )
+
         validation_gen = test_data_gen.flow_from_directory(
             data_path + "/test",
             target_size=self.target_size,
@@ -50,7 +53,9 @@ class SelfCNN:
             class_mode="categorical",
             color_mode="grayscale"
         )
+        return validation_gen
 
+    def train(self, train_steps=20, epochs=50, data_path="data", validation_steps=20, batch_size=20):
         self.model = models.Sequential()
 
         self.model.add(layers.Conv2D(64, (5, 5), activation='relu', input_shape=self.input_shape))
@@ -100,10 +105,10 @@ class SelfCNN:
         )
 
         self.model.fit_generator(
-            train_gen,
+            self.get_train_gen(data_path=data_path, batch_size=batch_size),
             steps_per_epoch=train_steps,
             epochs=epochs,
-            validation_data=validation_gen,
+            validation_data=self.get_validation_gen(batch_size=batch_size, data_path=data_path),
             validation_steps=validation_steps,
             callbacks=[tb_callback, save_callback, reduce_lr],
             workers=4,
@@ -141,6 +146,7 @@ class SelfCNN:
             class_mode="categorical",
             color_mode="grayscale"
         )
+
 
         metrics = self.model.evaluate_generator(eval_gen, steps=10)
         return {"model": "self-cnn",
