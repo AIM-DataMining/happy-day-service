@@ -16,8 +16,8 @@ class SelfCNN:
     model_path = None
 
     def __init__(self, save_dir="runs/"):
-        self.target_size = (48, 48)
-        self.input_shape = (48, 48, 1)
+        self.target_size = (96, 96)
+        self.input_shape = (96, 96, 1)
         self.save_dir = save_dir + str(round(time.time() * 1000))
         self.model_path = self.save_dir + "/self-cnn.{epoch:02d}-{val_loss:.2f}-{val_acc:.2f}.hdf5"
 
@@ -40,7 +40,9 @@ class SelfCNN:
             target_size=self.target_size,
             batch_size=batch_size,
             class_mode="categorical",
-            color_mode="grayscale"
+            color_mode="grayscale",
+            # save_to_dir="/tmp/happyday2/",
+            # save_prefix="self-cnn"
         )
 
         return train_gen
