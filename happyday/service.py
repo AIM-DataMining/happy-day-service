@@ -14,6 +14,7 @@ app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 Mb limit
 
 # don'T forget trailing slash!
 BASE_PATH = "/happy-day/"
+self_cnn_path = "self-cnn.464-0.20-0.92.hdf5"
 
 webdav_options = {
     'webdav_hostname': "https://schrolm.de",
@@ -43,10 +44,10 @@ def models_available(models, path="models"):
     return models_exist
 
 
-if models_available(["self-cnn.209-0.25.hdf5", "inception-v3-retrained.pb"]):
+if models_available([self_cnn_path, "inception-v3-retrained.pb"]):
     # Self-CNN
     self_cnn = SelfCNN()
-    self_cnn.load("models/self-cnn.209-0.25.hdf5")
+    self_cnn.load("models/" + self_cnn_path)
 
     # Retrained InceptionV3
     inception_graph = inception.load_graph("models/inception-v3-retrained.pb")
