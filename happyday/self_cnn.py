@@ -165,12 +165,12 @@ class SelfCNN:
 if __name__ == "__main__":
     cnn = SelfCNN()
 
-    cnn.load("models/self-cnn.209-0.25.hdf5")
-    cnn.train(train_steps=200,
+    # cnn.load("self-cnn.469-0.21.hdf5")
+    cnn.train(train_steps=310,
               epochs=500,
-              data_path="/home/oli/tmp/happy-day",
-              validation_steps=50,
-              batch_size=6)
+              data_path="/tmp/happy-day",
+              validation_steps=69,
+              batch_size=32)
     _pred = cnn.predict("/home/oli/schrolmcloud/Studium/DataMining/happy-day/smile/IMG_6457.JPG")
     logging.info(_pred)
     logging.info(cnn.evaluate())
