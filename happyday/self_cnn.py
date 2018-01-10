@@ -24,13 +24,15 @@ class SelfCNN:
     def get_train_gen(self, data_path, batch_size=20):
         train_data_gen = k.preprocessing.image.ImageDataGenerator(
             rescale=1. / 255.,
-            shear_range=0.1,
+            shear_range=0.2,
             zoom_range=0.3,
             rotation_range=0.5,
             width_shift_range=0.2,
             height_shift_range=0.2,
-            vertical_flip=False,
+            vertical_flip=True,
             horizontal_flip=True,
+            fill_mode="constant",
+            cval=1.
         )
 
         train_gen = train_data_gen.flow_from_directory(
