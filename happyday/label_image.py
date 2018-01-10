@@ -21,7 +21,7 @@ import time
 
 import numpy as np
 import tensorflow as tf
-
+import logging
 
 def load_graph(model_file):
     graph = tf.Graph()
@@ -55,7 +55,6 @@ def read_tensor_from_image_file(file_name, input_height=299, input_width=299,
     dims_expander = tf.expand_dims(float_caster, 0)
     resized = tf.image.resize_bilinear(dims_expander, [input_height, input_width])
     normalized = tf.divide(tf.subtract(resized, [input_mean]), [input_std])
-    print("first session")
     sess = tf.Session()
     result = sess.run(normalized)
 
@@ -98,10 +97,10 @@ def label_photo(file_name, graph, labels):
 
     top_k = results.argsort()[-5:][::-1]
 
-    print('\nEvaluation time (1-image): {:.3f}s\n'.format(end - start))
+    logging.info('\nEvaluation time (1-image): {:.3f}s\n'.format(end - start))
     resultdict = {}
     for i in top_k:
-        print(labels[i], results[i])
+        logging.info("{}:   {}".format(labels[i], results[i]))
         resultdict[labels[i]] = results[i].item()
     resultdict['model'] = 'InceptionV3'
     return resultdict
@@ -113,4 +112,4 @@ if __name__ == "__main__":
     _graph = load_graph(_model_file)
     _labels = load_labels(_label_file)
     pred = label_photo(file_name="happyday/data/smile.jpg", graph=_graph, labels=_labels)
-    print(pred)
+    logging.info(pred)

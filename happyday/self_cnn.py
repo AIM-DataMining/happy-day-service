@@ -1,3 +1,5 @@
+import logging
+
 import tensorflow.contrib.keras as k
 import time
 from PIL import Image
@@ -118,15 +120,15 @@ class SelfCNN:
             use_multiprocessing=True
         )
 
-        print(self.model.metrics_names)
+        logging.info(self.model.metrics_names)
 
     def predict(self, path):
         img = Image.open(path).convert('L')
         img_ = np.asarray(img.resize(self.target_size))
         img_np = np.array([np.array([img_]).T])
-        print(np.shape(img_np))
+        logging.info(np.shape(img_np))
         pred = self.model.predict_on_batch(img_np).tolist()
-        print(pred)
+        logging.info(pred)
         return {"model": "self_cnn",
                 "sad": pred[0][0],
                 "smile": pred[0][1],
@@ -167,5 +169,5 @@ if __name__ == "__main__":
               validation_steps=50,
               batch_size=6)
     _pred = cnn.predict("/home/oli/schrolmcloud/Studium/DataMining/happy-day/smile/IMG_6457.JPG")
-    print(_pred)
-    print(cnn.evaluate())
+    logging.info(_pred)
+    logging.info(cnn.evaluate())
