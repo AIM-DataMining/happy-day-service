@@ -130,9 +130,10 @@ class SelfCNN:
         pred = self.model.predict_on_batch(img_np).tolist()
         logging.info(pred)
         return {"model": "self_cnn",
-                "sad": pred[0][0],
-                "smile": pred[0][1],
-                "neutral": pred[0][2]}
+                "neutral": pred[0][0],
+                "sad": pred[0][1],
+                "smile": pred[0][2]
+                }
 
     def save(self, path):
         self.model.save(path)
