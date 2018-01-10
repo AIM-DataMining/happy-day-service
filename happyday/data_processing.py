@@ -1,7 +1,7 @@
 import logging
 import os
 import shutil
-
+from PIL import Image
 import pandas as pd
 
 
@@ -25,9 +25,9 @@ class DataPrep:
         test_images = images.iloc[test_ids]
         return test_images, train_images
 
-    def copy_images(self, images, mood, clazz, src_path, dest_path):
+    def copy_images(self, images, mood, clazz, src_path, dest_path, downsample_size=None):
         if not os.path.isdir(src_path):
-            logging.error("src_path does not exist or isn't a directory")
+            logging.error("src_path {} does not exist or isn't a directory".format(src_path))
             return False
 
         os.makedirs(dest_path + clazz + "/" + mood, exist_ok=True)
@@ -35,8 +35,16 @@ class DataPrep:
         for index, image in images.iterrows():
             image_src = src_path + mood + "/" + image.values[1]
             image_dest = dest_path + clazz + "/" + mood + "/" + image.values[1]
-            shutil.copy(image_src, image_dest)
+            if downsample_size is not None:
+                self.downsample(image_src, image_dest, downsample_size)
+            else:
+                shutil.copy(image_src, image_dest)
         return True
+
+    def downsample(self, image_src, image_dest, size):
+        img = Image.open(image_src)
+        img.thumbnail(size, Image.ANTIALIAS)
+        img.save(image_dest)
 
     def asd(self, moods, count, src_path, dst_path):
         for _mood in moods:
@@ -48,7 +56,8 @@ class DataPrep:
                                mood=_mood,
                                clazz=_clazzes[i],
                                src_path=src_path,
-                               dest_path=dst_path)
+                               dest_path=dst_path,
+                               downsample_size=(256, 256))
 
 
 if __name__ == "__main__":
@@ -60,7 +69,8 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--destination", help="Data destination path directory")
 
     args = parser.parse_args()
-
+    log = logging.getLogger()
+    log.setLevel(logging.INFO)
     _src_path = args.source  # "/home/oli/schrolmcloud/Studium/DataMining/happy-day/"
     _dst_path = args.destination  # "/tmp/happy-day/"
 
