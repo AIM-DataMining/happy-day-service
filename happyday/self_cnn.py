@@ -19,7 +19,7 @@ class SelfCNN:
         self.target_size = (48, 48)
         self.input_shape = (48, 48, 1)
         self.save_dir = save_dir + str(round(time.time() * 1000))
-        self.model_path = self.save_dir + "/self-cnn.{epoch:02d}-{val_loss:.2f}.hdf5"
+        self.model_path = self.save_dir + "/self-cnn.{epoch:02d}-{val_loss:.2f}-{val_acc:.2f}.hdf5"
 
     def get_train_gen(self, data_path, batch_size=20):
         train_data_gen = k.preprocessing.image.ImageDataGenerator(
@@ -100,7 +100,7 @@ class SelfCNN:
 
         save_callback = callbacks.ModelCheckpoint(
             self.model_path,
-            period=10,
+            period=1,
             save_best_only=True
         )
 
