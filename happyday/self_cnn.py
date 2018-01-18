@@ -32,7 +32,7 @@ class SelfCNN:
             vertical_flip=True,
             horizontal_flip=True,
             fill_mode="constant",
-            cval=1.
+            cval=0.
         )
 
         train_gen = train_data_gen.flow_from_directory(
