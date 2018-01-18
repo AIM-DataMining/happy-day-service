@@ -16,8 +16,8 @@ class SelfCNN:
     model_path = None
 
     def __init__(self, save_dir="runs/"):
-        self.target_size = (96, 96)
-        self.input_shape = (96, 96, 1)
+        self.target_size = (128, 128)
+        self.input_shape = (128, 128, 1)
         self.save_dir = save_dir + str(round(time.time() * 1000))
         self.model_path = self.save_dir + "/self-cnn.{epoch:02d}-{val_loss:.2f}-{val_acc:.2f}.hdf5"
 
