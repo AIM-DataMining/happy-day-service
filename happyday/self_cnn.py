@@ -74,7 +74,9 @@ class SelfCNN:
         self.model.add(layers.MaxPooling2D(pool_size=(3, 3), strides=(2, 2)))
         self.model.add(layers.Dropout(0.25))
 
-        self.model.add(layers.Conv2D(128, (4, 4), activation='relu'))
+        self.model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+        self.model.add(layers.AveragePooling2D())
+        self.model.add(layers.Conv2D(128, (1, 1), activation='relu'))
         self.model.add(layers.MaxPooling2D(pool_size=(2, 2)))
         self.model.add(layers.Dropout(0.25))
 
