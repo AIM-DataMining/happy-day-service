@@ -13,5 +13,5 @@ def test_self_test():
     for sentiment in [ "smile", "sad", "neutral"]:
         for model in service.self_test_eval(sentiment):
             logging.info("info: {}: {}".format(sentiment, model[sentiment]))
-            if model[sentiment] <= 0.5:
+            if model[sentiment] <= 0.05:
                 logging.error("Model eval failed, bad acc. {}: {}".format(sentiment, model[sentiment]))
