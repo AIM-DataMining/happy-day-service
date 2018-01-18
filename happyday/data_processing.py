@@ -43,7 +43,7 @@ class DataPrep:
 
     def downsample(self, image_src, image_dest, size):
         img = Image.open(image_src)
-        img.thumbnail(size, Image.ANTIALIAS)
+        img.thumbnail(size, resample=Image.ANTIALIAS)
         img.save(image_dest)
 
     def asd(self, moods, count, src_path, dst_path):
@@ -57,7 +57,7 @@ class DataPrep:
                                clazz=_clazzes[i],
                                src_path=src_path,
                                dest_path=dst_path,
-                               downsample_size=(256, 256))
+                               downsample_size=(128, 128))
 
 
 if __name__ == "__main__":
