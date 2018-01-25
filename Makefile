@@ -9,7 +9,7 @@ clean:
 	-docker rmi --force happyday-image
 
 build:
-	docker build -t happyday-image .
+	docker build -t happyday-image --build-arg user=$DAV_USER,pwd=$DAV_PASSWORD .
 
 pytest:
 	docker run --rm happyday-image /bin/bash -c "cd happyday-service; pytest"
