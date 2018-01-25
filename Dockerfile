@@ -22,5 +22,5 @@ RUN pip3 install -r requirements.txt
 
 EXPOSE 5000
 
-ENV FLASK_APP=happyday/service.py
+ENV FLASK_APP=happyday/service.py WEBDAV_HOST=https://schrolm.de WEBDAV_LOGIN=${user} WEBDAV_PWD=${pwd} WEBDAV_ROOTDIR=/owncloud/remote.php/webdav
 CMD ["flask", "run", "--host=0.0.0.0"]

@@ -10,7 +10,7 @@
     - docker
 
   install:
-    - docker build -t happyday-image .
+    - docker build --build-arg user=$DAV_USER,pwd=$DAV_PASSWORD -t happyday-image .
     - docker run -d -p 8080:5000 --name happyday happyday-image
 
   bevore_install:

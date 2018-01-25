@@ -16,11 +16,19 @@ app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 Mb limit
 BASE_PATH = "/happy-day/"
 self_cnn_path = "self-cnn.464-0.20-0.92.hdf5"
 
+log = logging.getLogger()
+
+credentials = {"user": os.environ["WEBDAV_LOGIN"],
+               "pwd":  os.environ["WEBDAV_PWD"],
+               "host": os.environ["WEBDAV_HOST"],
+               "dir":  os.environ["WEBDAV_ROOTDIR"],
+               }
+
 webdav_options = {
-    'webdav_hostname': "https://schrolm.de",
-    'webdav_login': "dm",
-    'webdav_password': "rd92c-wPkPi-TG2ta-wCZfo-fbR8n",
-    'webdav_root': "/owncloud/remote.php/webdav",
+    'webdav_hostname': credentials["host"],
+    'webdav_login': credentials["user"],
+    'webdav_password': credentials["host"],
+    'webdav_root': credentials["dir"],
     'verbose': False
 }
 
