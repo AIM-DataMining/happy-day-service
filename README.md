@@ -1,26 +1,25 @@
 # HappyDay
 [![Build Status](https://travis-ci.com/ofesseler/happy-day-service.svg?token=XbzPwgk1rQCmoqtErPQz&branch=master)](https://travis-ci.com/ofesseler/happy-day-service)
 
-Ziel des Projektes ist es, anhand des Porträts einer Person den Gesichtsausdruck bzw. die Gemütslage zu identifizieren und ein passendes Emoji zuzuordnen.
-Dabei beschränken wir uns zunächst auf den Zustand lächeln.
+The aim of the project is to identify the person's facial expression or mood by means of the portrait and assign a suitable emoji. In doing so, we confine ourselves to smiling at the condition.
 
-Ein typisches Szenario ist das Erstellen eines Fotos mit der Smartphone-Kamera in der im Projekt erstellten Android App.
-Daraufhin wird das Gesicht der fotografierten Person erkannt und zur Datenreduktion aus dem Bild ausgeschnitten.
-Der zugeschnittene Gesichtsausdruck wird zu einem Server gesendet.
-Auf diesem läuft ein Service, der aus dem Bildausschnitt aussagekräftige Gesichtszüge und Körperteile erkennt und diese definierten Emojis zuordnet.
-Realisiert wird die Gesichtserkennung mit einem CNN.
-Das Ergebnis der Auswertung wird an das Mobilgerät zurückgeschickt und dem User angezeigt.
-Dieser hat die Möglichkeit das empfangene Emoji zu bewerten und Feedback an den Server zu senden.
-Bei einer falschen Klassifizierung wird das Bild zum Training des CNN verwendet um dieses kontinuierlich zu verbessern.
+A typical scenario is the creation of a photo with the smartphone camera in the Android app created in the project.
+The face of the person photographed is then recognized and cut out of the image for data reduction.
+The tailored facial expression is sent to a server.
+On it runs a service that recognizes expressive facial features and body parts from the image detail and assigns them to defined emojis.
+Face recognition is realized with a CNN.
+The result of the evaluation is sent back to the mobile device and displayed to the user.
+He has the possibility to evaluate the received Emoji and send feedback to the server.
+In case of an incorrect classification, the image is used for CNN training to continuously improve it.
 
 # HappyDay Service
 
-In diesem Repository befindet sich das Backend zu HappyDay.
+This repository contains the backend for HappyDay.
 
 ## Start
 
-Zum besseren Testen und Deployen habe ich mich für Docker entschieden.
-Um die unten aufgeführten Kommandos auszuführen muss in das Projektverzeichnis gewechselt werden.
+For better testing and deploying I chose Docker.
+To execute the commands listed below, you must change to the project directory.
 
 ```
 docker build -t happyday-image .
@@ -28,7 +27,8 @@ docker build -t happyday-image .
 docker run --rm -it -p 5000:5000 --name happyday happyday-image
 ```
 
-Anschließend ist der Service unter `http://0.0.0.0:5000` erreichbar.
+The service is then available at http://0.0.0.0:5000
+
 
 ## Endpoints
 
