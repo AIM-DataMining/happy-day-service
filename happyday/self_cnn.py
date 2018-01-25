@@ -159,7 +159,7 @@ class SelfCNN:
             color_mode="grayscale"
         )
 
-        metrics = self.model.evaluate_generator(eval_gen, steps=10)
+        metrics = self.model.evaluate_generator(eval_gen, steps=100)
         return {"model": "self-cnn",
                 "metrics": metrics,
                 "names": self.model.metrics_names
@@ -182,14 +182,19 @@ class SelfCNN:
 
 
 if __name__ == "__main__":
+    import argparse
+    logging.basicConfig(level=logging.INFO)
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--path", help="Path to prepared dataset")
+    args = parser.parse_args()
+
     cnn = SelfCNN()
 
-    # cnn.load("self-cnn.469-0.21.hdf5")
+    # cnn.load("models/self-cnn.464-0.20-0.92.hdf5")
     cnn.train(train_steps=310,
               epochs=500,
               data_path="/tmp/happy-day",
               validation_steps=69,
               batch_size=32)
-    _pred = cnn.predict("/home/oli/schrolmcloud/Studium/DataMining/happy-day/smile/IMG_6457.JPG")
-    logging.info(_pred)
     logging.info(cnn.evaluate())
