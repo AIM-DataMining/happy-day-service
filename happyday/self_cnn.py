@@ -41,8 +41,6 @@ class SelfCNN:
             batch_size=batch_size,
             class_mode="categorical",
             color_mode="grayscale",
-            # save_to_dir="/tmp/happyday2/",
-            # save_prefix="self-cnn"
         )
 
         return train_gen
@@ -179,14 +177,12 @@ class SelfCNN:
         return True
 
 
-
-
 if __name__ == "__main__":
     import argparse
     logging.basicConfig(level=logging.INFO)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--path", help="Path to prepared dataset")
+    parser.add_argument("-p", "--path", help="Path to prepared dataset", default="/tmp/happyday")
     args = parser.parse_args()
 
     cnn = SelfCNN()
@@ -194,7 +190,7 @@ if __name__ == "__main__":
     # cnn.load("models/self-cnn.464-0.20-0.92.hdf5")
     cnn.train(train_steps=310,
               epochs=500,
-              data_path="/tmp/happy-day",
+              data_path=args.path,
               validation_steps=69,
               batch_size=32)
     logging.info(cnn.evaluate())
