@@ -118,14 +118,17 @@ def upload_file(sentiment=None):
     local_path, filename = save_to_disk(request.files['photo'].stream)
     if sentiment == "sad":
         remote_path = BASE_PATH + "sad/" + filename
+        self_cnn.learn(remote_path, [0, 1, 0])
     elif sentiment == "smile":
         remote_path = BASE_PATH + "smile/" + filename
+        self_cnn.learn(local_path + filename, [0, 0, 1])
     elif sentiment == "sleep":
         remote_path = BASE_PATH + "sleep/" + filename
     elif sentiment == "kiss":
         remote_path = BASE_PATH + "kiss/" + filename
     elif sentiment == "neutral":
         remote_path = BASE_PATH + "neutral/" + filename
+        self_cnn.learn(local_path + filename, [1, 0, 0])
     elif sentiment == "angry":
         remote_path = BASE_PATH + "angry/" + filename
     elif sentiment == "surprised":
@@ -133,7 +136,7 @@ def upload_file(sentiment=None):
     if remote_path is not None:
 
         client.upload_sync(remote_path=remote_path, local_path=local_path + filename)
-        remove_from_disk(local_path + filename)
+        # remove_from_disk(local_path + filename)
         return json.dumps({"ok": True})
     else:
         return json.dumps({"ok": False})

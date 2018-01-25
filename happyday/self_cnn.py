@@ -165,6 +165,21 @@ class SelfCNN:
                 "names": self.model.metrics_names
                 }
 
+    def learn(self, img_path, klass):
+        img = Image.open(img_path).convert('L')
+        img_ = np.asarray(img.resize(self.target_size))
+        img_np = np.array([np.array([img_]).T])
+        logging.info(np.shape(img_np))
+        try:
+            self.model.fit(x=img_np, y=klass, batch_size=1, epochs=1)
+        except Exception as e:
+            logging.error(e)
+            return False
+        # TODO online learning implementieren.
+        return True
+
+
+
 
 if __name__ == "__main__":
     cnn = SelfCNN()
