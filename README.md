@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.com/ofesseler/happy-day-service.svg?token=XbzPwgk1rQCmoqtErPQz&branch=master)](https://travis-ci.com/ofesseler/happy-day-service)
 # HappyDay
+[![Build Status](https://travis-ci.com/ofesseler/happy-day-service.svg?token=XbzPwgk1rQCmoqtErPQz&branch=master)](https://travis-ci.com/ofesseler/happy-day-service)
 
 Ziel des Projektes ist es, anhand des Porträts einer Person den Gesichtsausdruck bzw. die Gemütslage zu identifizieren und ein passendes Emoji zuzuordnen.
 Dabei beschränken wir uns zunächst auf den Zustand lächeln.
